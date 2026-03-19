@@ -1,0 +1,186 @@
+<div class="flex flex-col h-screen font-sans" style="background: #080c14;">
+
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
+  <!-- Header -->
+  <header class="aria-header flex items-center justify-between px-6 py-4 border-b z-10"
+          style="background: rgba(10,15,25,0.95); border-color: rgba(20,184,166,0.15); backdrop-filter: blur(12px);">
+    <div class="flex items-center gap-4">
+      <div class="aria-logo flex items-center justify-center w-11 h-11 rounded-2xl border"
+           style="background: linear-gradient(135deg, #0d2420, #0a1628); border-color: rgba(20,184,166,0.4);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight" style="color: #f0fdf4; font-family: 'Syne', sans-serif; letter-spacing: -0.02em;">
+          ARIA
+        </h1>
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+          <p class="text-xs font-medium" style="color: #14b8a6;">Adaptive Reasoning & Intelligence Assistant</p>
+        </div>
+      </div>
+    </div>
+
+    @if (history().length > 0) {
+      <button (click)="clearChat()"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105"
+              style="background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2);">
+        <i class="bi bi-trash3"></i>
+        Clear Chat
+      </button>
+    }
+  </header>
+
+  <!-- Chat History -->
+  <main #chatContainer class="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 scroll-smooth">
+
+    <!-- Empty State -->
+    @if (history().length === 0 && !loading()) {
+      <div class="flex flex-col items-center justify-center h-full gap-6">
+        <div class="flex flex-col items-center gap-4">
+          <div class="w-24 h-24 rounded-3xl flex items-center justify-center border"
+               style="background: linear-gradient(135deg, #0d2420, #0a1628); border-color: rgba(20,184,166,0.3);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                    stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <h2 class="text-2xl font-bold mb-2" style="color: #f0fdf4; font-family: 'Syne', sans-serif;">Hello, I'm ARIA</h2>
+            <p class="text-sm" style="color: #64748b;">Your Adaptive Reasoning & Intelligence Assistant</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 justify-center max-w-lg">
+          @for (suggestion of ['Explain quantum computing', 'Write a Python function', 'What is machine learning?', 'Help me debug code']; track suggestion) {
+            <button (click)="message.set(suggestion); sendMessage()"
+                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105"
+                    style="background: rgba(20,184,166,0.08); color: #14b8a6; border: 1px solid rgba(20,184,166,0.2);">
+              {{ suggestion }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Messages -->
+    @for (item of history(); track item.id) {
+
+      <!-- User Message -->
+      @if (item.sender === 'user') {
+        <div class="message-animate flex flex-col items-end gap-1">
+          <span class="text-xs px-2" style="color: #475569;">You · {{ formatTime(item.timestamp) }}</span>
+          <div class="flex items-end gap-3">
+            <div class="group relative max-w-[75%] md:max-w-[60%] px-5 py-3 rounded-2xl rounded-tr-none text-sm leading-relaxed"
+                 style="background: linear-gradient(135deg, #0f766e, #0d9488); color: #f0fdf4;">
+              {{ item.message }}
+              <button (click)="copyMessage(item)"
+                      class="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all w-7 h-7 rounded-lg flex items-center justify-center"
+                      style="background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.2); color: #14b8a6;">
+                <i class="bi text-xs" [class]="copiedId() === item.id ? 'bi-check' : 'bi-copy'"></i>
+              </button>
+            </div>
+            <div class="flex-shrink-0 w-9 h-9 rounded-2xl flex items-center justify-center text-white font-bold text-sm"
+                 style="background: linear-gradient(135deg, #0f766e, #0d9488);">
+              A
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Bot Message -->
+      @if (item.sender === 'bot') {
+        <div class="message-animate flex flex-col items-start gap-1">
+          <span class="text-xs px-2" style="color: #475569;">ARIA · {{ formatTime(item.timestamp) }}</span>
+          <div class="flex items-end gap-3">
+            <div class="flex-shrink-0 w-9 h-9 rounded-2xl flex items-center justify-center border"
+                 style="background: linear-gradient(135deg, #0d2420, #0a1628); border-color: rgba(20,184,166,0.3);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                      stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="group relative max-w-[75%] md:max-w-[60%] px-5 py-3 rounded-2xl rounded-tl-none text-sm leading-relaxed aria-markdown"
+                 style="background: rgba(15,23,42,0.8); color: #cbd5e1; border: 1px solid rgba(20,184,166,0.1);"
+                 [innerHTML]="renderMarkdown(item.message)">
+            </div>
+            <button (click)="copyMessage(item)"
+                    class="opacity-0 group-hover:opacity-100 transition-all w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.2); color: #14b8a6;">
+              <i class="bi text-xs" [class]="copiedId() === item.id ? 'bi-check' : 'bi-copy'"></i>
+            </button>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="message-animate flex flex-col items-start gap-1">
+        <span class="text-xs px-2" style="color: #475569;">ARIA</span>
+        <div class="flex items-end gap-3">
+          <div class="flex-shrink-0 w-9 h-9 rounded-2xl flex items-center justify-center border"
+               style="background: linear-gradient(135deg, #0d2420, #0a1628); border-color: rgba(20,184,166,0.3);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                    stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="px-5 py-4 rounded-2xl rounded-tl-none"
+               style="background: rgba(15,23,42,0.8); border: 1px solid rgba(20,184,166,0.1);">
+            <div class="flex items-center gap-1.5">
+              <div class="typing-dot w-2 h-2 rounded-full" style="background: #14b8a6;"></div>
+              <div class="typing-dot w-2 h-2 rounded-full" style="background: #14b8a6;"></div>
+              <div class="typing-dot w-2 h-2 rounded-full" style="background: #14b8a6;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="flex justify-center">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm"
+             style="background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2);">
+          <i class="bi bi-exclamation-circle"></i>
+          {{ error() }}
+        </div>
+      </div>
+    }
+
+  </main>
+
+  <!-- Input -->
+  <footer class="px-4 md:px-8 py-5 border-t"
+          style="background: rgba(10,15,25,0.95); border-color: rgba(20,184,166,0.1); backdrop-filter: blur(12px);">
+    <div class="max-w-4xl mx-auto relative">
+      <input
+        type="text"
+        [ngModel]="message()"
+        (ngModelChange)="message.set($event)"
+        (keyup.enter)="sendMessage()"
+        [disabled]="loading()"
+        placeholder="Ask ARIA anything..."
+        class="w-full rounded-2xl pl-6 pr-16 py-4 text-sm outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        style="background: rgba(15,23,42,0.8); color: #e2e8f0; border: 1px solid rgba(20,184,166,0.2); font-family: 'DM Sans', sans-serif;"
+      >
+      <button
+        (click)="sendMessage()"
+        [disabled]="!message().trim() || loading()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+        style="background: linear-gradient(135deg, #0f766e, #0d9488); color: white;">
+        <i class="bi bi-send-fill text-sm ml-0.5"></i>
+      </button>
+    </div>
+    <p class="text-center text-xs mt-3" style="color: #1e3a37;">
+      ARIA · Powered by Llama 3.3 · Built with Angular & Node.js
+    </p>
+  </footer>
+
+</div>

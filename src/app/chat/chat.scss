@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+:host {
+  display: block;
+  height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.aria-header h1 {
+  font-family: 'Syne', sans-serif;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message-animate {
+  animation: fadeSlideUp 0.3s ease forwards;
+}
+
+main::-webkit-scrollbar { width: 4px; }
+main::-webkit-scrollbar-track { background: transparent; }
+main::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+main::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+.typing-dot:nth-child(1) { animation: bounce 1.2s infinite 0s; }
+.typing-dot:nth-child(2) { animation: bounce 1.2s infinite 0.2s; }
+.typing-dot:nth-child(3) { animation: bounce 1.2s infinite 0.4s; }
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(20, 184, 166, 0); }
+}
+
+.aria-logo { animation: pulseGlow 2.5s infinite; }
+
+/* Markdown styles for bot messages */
+.aria-markdown {
+  line-height: 1.7;
+
+  p { margin-bottom: 0.75rem; }
+  p:last-child { margin-bottom: 0; }
+
+  strong { color: #e2e8f0; font-weight: 600; }
+
+  code {
+    background: rgba(20, 184, 166, 0.1);
+    color: #5eead4;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    border: 1px solid rgba(20, 184, 166, 0.15);
+  }
+
+  pre {
+    background: rgba(2, 8, 23, 0.8);
+    border: 1px solid rgba(20, 184, 166, 0.15);
+    border-radius: 10px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0.75rem 0;
+
+    code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #94a3b8;
+      font-size: 0.82em;
+    }
+  }
+
+  ul, ol {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+    li { margin-bottom: 0.25rem; }
+  }
+
+  ul li { list-style-type: disc; }
+  ol li { list-style-type: decimal; }
+
+  h1, h2, h3 {
+    color: #e2e8f0;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  h1 { font-size: 1.2em; }
+  h2 { font-size: 1.1em; }
+  h3 { font-size: 1em; }
+
+  blockquote {
+    border-left: 3px solid rgba(20, 184, 166, 0.4);
+    padding-left: 1rem;
+    color: #64748b;
+    margin: 0.5rem 0;
+    font-style: italic;
+  }
+
+  a {
+    color: #14b8a6;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

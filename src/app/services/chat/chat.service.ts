@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class ChatService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/chat';
+  private apiUrl = 'https://aria-chat-backend.onrender.com/chat';
 
   async sendMessageToLLM(message: string): Promise<string> {
     try {
